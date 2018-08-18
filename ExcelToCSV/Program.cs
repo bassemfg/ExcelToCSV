@@ -54,14 +54,24 @@ namespace ExcelToCSV
                     xlWorksheet = xlWorkbook.Sheets[1];
                     xlRange = xlWorksheet.UsedRange;
                     string a = "";
+                    int idx = 0;
                     foreach (Range cell in xlRange.Cells)
                     {
                         if (cell.Value2 != null)
                             a = cell.Value2.ToString();
                         if (!string.IsNullOrEmpty(a))
-                            cell.Value = a.Replace(",", " ");
+                            //cell.Value = a.Replace(",", " ");
+                            if (a.Trim() == "SourcePath")
+                            {
+                                xlWorkbook.SaveAs(f.FullName + ".csv", XlFileFormat.xlCSV, null, null, null, null, XlSaveAsAccessMode.xlExclusive, null, null, null, null);
+
+                                break;
+                            }
+                        if (idx > 4)
+                            break;
+                        idx++;
                     }
-                    xlWorkbook.SaveAs(f.FullName + ".csv", XlFileFormat.xlCSV, null, null, null, null, XlSaveAsAccessMode.xlExclusive, null, null, null, null);
+                    //xlWorkbook.SaveAs(f.FullName + ".csv", XlFileFormat.xlCSV, null, null, null, null, XlSaveAsAccessMode.xlExclusive, null, null, null, null);
                     /*
                     int rowCount = xlRange.Rows.Count;
                     int colCount = xlRange.Columns.Count;
