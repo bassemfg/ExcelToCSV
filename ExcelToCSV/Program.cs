@@ -43,12 +43,16 @@ namespace ExcelToCSV
             Workbook xlWorkbook;
             Worksheet xlWorksheet;
             Range xlRange;
+            DateTime startTime = DateTime.Now;
+int r = 1;
             foreach (FileInfo f in dir.GetFiles())
             {
-                Console.WriteLine("processing file " + f.Name);
                 try
                 {
-                    int r = 1;
+                    
+                    Console.WriteLine("Total elapsed time " + (DateTime.Now - startTime).TotalMinutes + " minutes");
+                    Console.WriteLine(r.ToString() + " - processing file " + f.Name);
+
                     xlApp = new Application();
                     xlWorkbook = xlApp.Workbooks.Open(f.FullName);
                     xlWorksheet = xlWorkbook.Sheets[1];
@@ -63,12 +67,16 @@ namespace ExcelToCSV
                             //cell.Value = a.Replace(",", " ");
                             if (a.Trim() == "SourcePath")
                             {
-                                xlWorkbook.SaveAs(f.FullName + ".csv", XlFileFormat.xlCSV, null, null, null, null, XlSaveAsAccessMode.xlExclusive, null, null, null, null);
 
+                                xlWorkbook.SaveAs(f.FullName + ".csv", XlFileFormat.xlCSV, null, null, null, null, XlSaveAsAccessMode.xlExclusive, null, null, null, null);
+                                Console.WriteLine("saved file as csv " +f.Name);
                                 break;
                             }
                         if (idx > 4)
+                        {
+                            Console.WriteLine("Not a metadata file");
                             break;
+                        }
                         idx++;
                     }
                     //xlWorkbook.SaveAs(f.FullName + ".csv", XlFileFormat.xlCSV, null, null, null, null, XlSaveAsAccessMode.xlExclusive, null, null, null, null);
@@ -187,6 +195,7 @@ namespace ExcelToCSV
                 finally
                 {
                     xlApp.Quit();
+                    r++;
                 }
             }
             /*
