@@ -49,144 +49,147 @@ int r = 1;
             {
                 try
                 {
-                    
-                    Console.WriteLine("Total elapsed time " + (DateTime.Now - startTime).TotalMinutes + " minutes");
-                    Console.WriteLine(r.ToString() + " - processing file " + f.Name);
-
-                    xlApp = new Application();
-                    xlWorkbook = xlApp.Workbooks.Open(f.FullName);
-                    xlWorksheet = xlWorkbook.Sheets[1];
-                    xlRange = xlWorksheet.UsedRange;
-                    string a = "";
-                    int idx = 0;
-                    foreach (Range cell in xlRange.Cells)
+                    if (f.Name.ToLower().IndexOf(".xlsx") > 0)
                     {
-                        if (cell.Value2 != null)
-                            a = cell.Value2.ToString();
-                        if (!string.IsNullOrEmpty(a))
-                            //cell.Value = a.Replace(",", " ");
-                            if (a.Trim() == "SourcePath")
-                            {
 
-                                xlWorkbook.SaveAs(f.FullName + ".csv", XlFileFormat.xlCSV, null, null, null, null, XlSaveAsAccessMode.xlExclusive, null, null, null, null);
-                                Console.WriteLine("saved file as csv " +f.Name);
+                        Console.WriteLine("Total elapsed time " + (DateTime.Now - startTime).TotalMinutes + " minutes");
+                        Console.WriteLine(r.ToString() + " - processing file " + f.Name);
+
+                        xlApp = new Application();
+                        xlWorkbook = xlApp.Workbooks.Open(f.FullName);
+                        xlWorksheet = xlWorkbook.Sheets[1];
+                        xlRange = xlWorksheet.UsedRange;
+                        xlRange.Replace(",", "*$%");
+                        string a = "";
+                        int idx = 0;
+                        foreach (Range cell in xlRange.Cells)
+                        {
+                            if (cell.Value2 != null)
+                                a = cell.Value2.ToString();
+                            if (!string.IsNullOrEmpty(a))
+                            //cell.Value = a.Replace(",", " ");
+                            //if (a.Trim() == "SourcePath")
+                            {
+                                xlWorksheet.SaveAs(f.FullName + ".csv", XlFileFormat.xlCSV, null, null, null, null, null, null, null, null);
+                                Console.WriteLine("saved file as csv " + f.Name);
                                 break;
                             }
-                        if (idx > 4)
-                        {
-                            Console.WriteLine("Not a metadata file");
-                            break;
-                        }
-                        idx++;
-                    }
-                    //xlWorkbook.SaveAs(f.FullName + ".csv", XlFileFormat.xlCSV, null, null, null, null, XlSaveAsAccessMode.xlExclusive, null, null, null, null);
-                    /*
-                    int rowCount = xlRange.Rows.Count;
-                    int colCount = xlRange.Columns.Count;
-
-                    for (r = 1; r <= rowCount; r++)
-                    {
-                        xslxRow.Clear();
-                        for (int j = 1; j < colCount; j++)
-                        {
-                            if (xlRange.Cells[r, j].Value2!=null)
-                                xslxRow.Append(xlRange.Cells[r, j].Value2.ToString());
-                            xslxRow.Append(',');
-                        }
-
-                        line = xslxRow.ToString().Remove(xslxRow.ToString().Length - 1);
-
-
-
-
-                        if (line.Trim().Length > 0)
-                        {
-                            line = Encoding.ASCII.GetString(Encoding.ASCII.GetBytes(line));
-                            // if it is not a header, i.e not start of a new table, add a new row to target
-                            //if (!line.StartsWith(FirstCellHeader))
-                            if (r != 1)
+                            if (idx > 4)
                             {
-                                if (dt == null)
+                                Console.WriteLine("Not a metadata file");
+                                break;
+                            }
+                            idx++;
+                        }
+                        //xlWorkbook.SaveAs(f.FullName + ".csv", XlFileFormat.xlCSV, null, null, null, null, XlSaveAsAccessMode.xlExclusive, null, null, null, null);
+                        /*
+                        int rowCount = xlRange.Rows.Count;
+                        int colCount = xlRange.Columns.Count;
+
+                        for (r = 1; r <= rowCount; r++)
+                        {
+                            xslxRow.Clear();
+                            for (int j = 1; j < colCount; j++)
+                            {
+                                if (xlRange.Cells[r, j].Value2!=null)
+                                    xslxRow.Append(xlRange.Cells[r, j].Value2.ToString());
+                                xslxRow.Append(',');
+                            }
+
+                            line = xslxRow.ToString().Remove(xslxRow.ToString().Length - 1);
+
+
+
+
+                            if (line.Trim().Length > 0)
+                            {
+                                line = Encoding.ASCII.GetString(Encoding.ASCII.GetBytes(line));
+                                // if it is not a header, i.e not start of a new table, add a new row to target
+                                //if (!line.StartsWith(FirstCellHeader))
+                                if (r != 1)
+                                {
+                                    if (dt == null)
+                                        dt = new System.Data.DataTable();
+                                    dt.Rows.Add(dt.NewRow());
+                                }
+                                else //if it is a header i.e. start of new table
+                                {
+                                    // merge with existing table, if it exists
+                                    if (dt != null)
+                                        dtMerged.Merge(dt, true, MissingSchemaAction.Add);
+                                    ht = new Hashtable();
                                     dt = new System.Data.DataTable();
-                                dt.Rows.Add(dt.NewRow());
-                            }
-                            else //if it is a header i.e. start of new table
-                            {
-                                // merge with existing table, if it exists
-                                if (dt != null)
-                                    dtMerged.Merge(dt, true, MissingSchemaAction.Add);
-                                ht = new Hashtable();
-                                dt = new System.Data.DataTable();
 
 
-                            }
+                                }
 
 
-                            sbFileRemoveSpaces.Append(line);
-                            sbFileRemoveSpaces.Append(@"
-");
-                            columns = line.Split(',');
+                                sbFileRemoveSpaces.Append(line);
+                                sbFileRemoveSpaces.Append(@"
+    ");
+                                columns = line.Split(',');
 
-                            i = 0;
+                                i = 0;
 
-                            //foreach (string s in columns)
-                            for(i=0;i<columns.Length;i++)
-                            {
-                                 {
-                                    Console.WriteLine("In Row: " + r.ToString()+ " file " + f.Name);
+                                //foreach (string s in columns)
+                                for(i=0;i<columns.Length;i++)
+                                {
+                                     {
+                                        Console.WriteLine("In Row: " + r.ToString()+ " file " + f.Name);
 
-                                    var s = columns[i];
-                                    if (r == 1)
-                                    //line.StartsWith(FirstCellHeader))
-                                    {
-                                        if (string.IsNullOrEmpty(s))
-                                            s = "Col" + i.ToString();
-
-                                        if (dt.Columns.Contains(s) == false)
+                                        var s = columns[i];
+                                        if (r == 1)
+                                        //line.StartsWith(FirstCellHeader))
                                         {
-                                            dt.Columns.Add(s);
-                                            ht.Add(i, s);
-                                        }
-                                        else // to solve the problem of columns with same name
-                                        {
-                                            if (dt.Columns.Contains(s + i.ToString()) == false)
+                                            if (string.IsNullOrEmpty(s))
+                                                s = "Col" + i.ToString();
+
+                                            if (dt.Columns.Contains(s) == false)
                                             {
-                                                dt.Columns.Add(s + i.ToString());
-                                                ht.Add(i, s + i.ToString());
+                                                dt.Columns.Add(s);
+                                                ht.Add(i, s);
+                                            }
+                                            else // to solve the problem of columns with same name
+                                            {
+                                                if (dt.Columns.Contains(s + i.ToString()) == false)
+                                                {
+                                                    dt.Columns.Add(s + i.ToString());
+                                                    ht.Add(i, s + i.ToString());
+                                                }
+                                            }
+
+
+                                            if (headers.Contains(s) == false)
+                                            {
+                                                headers.Enqueue(s);
+
+                                                sb.Append(s);
+                                                sb.Append(@"
+    ");
                                             }
                                         }
 
-
-                                        if (headers.Contains(s) == false)
+                                        else
                                         {
-                                            headers.Enqueue(s);
+                                            Val = s;
+                                            if (s.IndexOf('#') > 0)
+                                                Val = s.Substring(1 + s.IndexOf('#'));
 
-                                            sb.Append(s);
-                                            sb.Append(@"
-");
+                                            if (i < dt.Columns.Count && !string.IsNullOrEmpty(ht[i].ToString()))
+                                                dt.Rows[dt.Rows.Count - 1][ht[i].ToString()] = Val;//dt.Columns[i].ColumnName
                                         }
                                     }
-
-                                    else
-                                    {
-                                        Val = s;
-                                        if (s.IndexOf('#') > 0)
-                                            Val = s.Substring(1 + s.IndexOf('#'));
-
-                                        if (i < dt.Columns.Count && !string.IsNullOrEmpty(ht[i].ToString()))
-                                            dt.Rows[dt.Rows.Count - 1][ht[i].ToString()] = Val;//dt.Columns[i].ColumnName
-                                    }
+                                    //i++;
                                 }
-                                //i++;
+
                             }
-
                         }
+
+                        sbFileRemoveSpaces.Append(@"
+    ");
+
+                        */
                     }
-
-                    sbFileRemoveSpaces.Append(@"
-");
-
-                    */
                 }
                 catch (Exception e)
                 {
@@ -194,9 +197,11 @@ int r = 1;
                 }
                 finally
                 {
-                    xlApp.Quit();
+                    if (xlApp != null)
+                        xlApp.Quit();
                     r++;
                 }
+            
             }
             /*
             StreamWriter sw = new StreamWriter(csvOutputFilePath + @"_columns.txt");
